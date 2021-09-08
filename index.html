@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earthquake Map</title>
+    <style>
+        /* Define the size of map div */
+        #map {
+            height: 100%;
+        }
+        html,body{
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+    </style>
+    <script>
+        // Define global map variable
+        let map;
+        // Initiate Map load
+        function initMap() {
+            // Set map properties
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 4,
+                center: { lat: -34.397, lng: 150.644 },
+                mapTypeId: "terrain",
+            });
+            // Create marker on map by using GeoJSON
+            map.data.loadGeoJson("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson");
+            // Define InfoWindow variable
+            var infowindow = new google.maps.InfoWindow();
+            // When click on earthquake marker, will show location and datetime information
+            map.data.addListener('click', function (event) {
+                var earthquakeLocation = event.feature.getProperty("place");            // Get clicked marker earthquake location
+                var earthquakeDateTime = new Date(event.feature.getProperty("time"));   // Get clicked marker earthquake datetime and convert seconds to datetime format
+                infowindow.setOptions({ 
+                    content: "<div style='width:150px; text-align: center;'>" + earthquakeLocation + "<br>" + earthquakeDateTime + "</div>",    // Display earthquake location and datetime
+                    pixelOffset: new google.maps.Size(0, -30),                          // Set InfoWindow above the anchorPoint
+                    position: event.feature.getGeometry().get()                         // Display InfoWindow on clicked marker earthquake location
+                });
+                // Open InfoWindow
+                infowindow.open(map);
+            });
+        }
+    </script>
+</head>
+<body>
+    <!-- Disaply map -->
+     <div id="map"></div>
+    <!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVVxCKZBu6IDlzZM5VIL1LLgnDrBatdZQ&callback=initMap&libraries=&v=weekly" async></script>
+</body>
+</html>
